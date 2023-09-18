@@ -8,7 +8,7 @@ async function SaveUser(req, res){
     try {
       const { first_name, last_name, email, password, age } = req.body;
       // Hash the password using bcrypt
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
   
       // Create a new user
       const user = new User({
@@ -22,10 +22,10 @@ async function SaveUser(req, res){
       // Save the user to the database
       await user.save();
   
-      res.status(201).send('User registered successfully');
+      res.status(201).json({message:'success',data:user});
     } catch (error) {
-      console.error('Error during signup:', error);
-      res.status(500).send('Internal server error');
+ 
+      res.status(500).json({message:error});
     }
   }
 async function authenticateUser(req, res, next) {
@@ -34,26 +34,25 @@ async function authenticateUser(req, res, next) {
   
       // Find the user by their email
       const user = await modal.findOne({ email });
-  
-      if (!user) {
-        return res.status(401).json({ message: "Authentication failed" });
-      }
+    
+      // if (!user) {
+      //   return res.status(401).json({ message: "Authentication failed" });
+      // }
   
       // Compare the provided password with the hashed password in the database
       const passwordMatch = await bcrypt.compare(password, user.password);
+    
     //   const passwordMatch =  user.password
   
       if (passwordMatch ) {
-        // Passwords match; user is authenticated
+       
         req.user = user; // Attach the user object to the request
+        res.status(201).json({message:'success',data:user});
         next(); // Continue to the next middleware or route
-      } else {
-        // Passwords don't match
-        res.status(401).json({ message: "Authentication failed" });
-      }
+      } 
     } catch (error) {
       console.error("Error during authentication:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message:"Error during authentication"+error });
     }
   }
 //Get All user

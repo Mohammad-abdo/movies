@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
+const cors = require('cors');
 const dotenv = require("dotenv");
 dotenv.config();
 const { conn } = require("./db");
 const modal = require('./models/Users');
 const UserSchema = require('./routes/UserRouter');
 const {SaveUser,getAllUser,authenticateUser}=require ('./controllers/UsersController')
-
+app.use(cors());
 
 // Connect to MongoDB
 conn();
